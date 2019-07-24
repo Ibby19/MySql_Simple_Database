@@ -12,6 +12,8 @@ SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
+CREATE DATABASE 'Umuzi'
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -37,7 +39,8 @@ CREATE TABLE `customers` (
   `Phone` varchar(45) NOT NULL,
   `Email` varchar(100) NOT NULL,
   `City` varchar(45) NOT NULL,
-  `Country` varchar(45) NOT NULL
+  `Country` varchar(45) NOT NULL,
+  PRIMARY KEY (`CustomerID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -62,7 +65,8 @@ CREATE TABLE `employees` (
   `FirstName` varchar(50) NOT NULL,
   `LastName` varchar(50) NOT NULL,
   `Email` varchar(100) NOT NULL,
-  `JobTitle` varchar(45) NOT NULL
+  `JobTitle` varchar(45) NOT NULL,
+  PRIMARY KEY (`EmployeeID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -85,7 +89,8 @@ CREATE TABLE `orders` (
   `Order` datetime NOT NULL,
   `DateRequired` date NOT NULL,
   `DateShipped` date NOT NULL,
-  `Status` varchar(45) NOT NULL
+  `Status` varchar(45) NOT NULL,
+  PRIMARY KEY (`OrderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -106,7 +111,9 @@ INSERT INTO `orders` (`OrderID`, `Order`, `DateRequired`, `DateShipped`, `Status
 CREATE TABLE `payments` (
   `CustomerID` int(11) NOT NULL,
   `PaymentDate` datetime NOT NULL,
-  `Amount` decimal(10,2) NOT NULL
+  `Amount` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`CustomerID`)
+  FOREIGN KEY ('CustomerID') REFERENCES 'Customers' ('CustomerID')
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -127,7 +134,8 @@ CREATE TABLE `products` (
   `ProductID` int(11) NOT NULL,
   `ProductName` varchar(45) NOT NULL,
   `Description` varchar(100) NOT NULL,
-  `BuyPrice` decimal(10,2) NOT NULL
+  `BuyPrice` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`ProductID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -138,44 +146,6 @@ INSERT INTO `products` (`ProductID`, `ProductName`, `Description`, `BuyPrice`) V
 (1, 'Harley Davidson Chopper', 'This replica features working kickstand, front suspension, gear-shift lever', '150.75'),
 (2, 'Classic Car', 'Turnable front wheels, steering function', '550.75'),
 (3, 'Sports car', 'Turnable front wheels, steering function', '700.60');
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `customers`
---
-ALTER TABLE `customers`
-  ADD PRIMARY KEY (`CustomerID`);
-
---
--- Indexes for table `employees`
---
-ALTER TABLE `employees`
-  ADD PRIMARY KEY (`EmployeeID`);
-
---
--- Indexes for table `orders`
---
-ALTER TABLE `orders`
-  ADD PRIMARY KEY (`OrderID`);
-
---
--- Indexes for table `payments`
---
-ALTER TABLE `payments`
-  ADD PRIMARY KEY (`CustomerID`);
-
---
--- Indexes for table `products`
---
-ALTER TABLE `products`
-  ADD PRIMARY KEY (`ProductID`);
-
---
--- AUTO_INCREMENT for dumped tables
---
 
 --
 -- AUTO_INCREMENT for table `customers`
@@ -207,6 +177,83 @@ ALTER TABLE `payments`
 ALTER TABLE `products`
   MODIFY `ProductID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
+
+-- SELECT ALL records from table Customers.
+SELECT * FROM `customers`;
+
+-- SELECT records only from the name column in the Customers table.
+SELECT FirstName
+FROM customers;
+
+-- Show the name of the Customer whose CustomerID is 1.
+SELECT FirstName
+FROM customers
+WHERE CustomerID = 1;
+
+-- UPDATE the record for CustomerID =1 on the Customer table so that the name is "Lerato Mabitso".
+UPDATE customers 
+SET FirstName = 'Lerato', LastName = 'Mabitso' 
+WHERE customers.CustomerID = 1;
+
+-- DELETE the record from the Customers table for customer 2 (CustomerID = 2)
+DELETE FROM Customers
+WHERE CustomersID = 2;
+
+-- Select all unique values from the table Products.
+SELECT DISTINCT *
+FROM products;
+
+-- Return the MAXIMUM payment made on the PAYMENTS table.
+SELECT MAX(Amount)
+FROM payments;
+
+-- Create a query that selects all customers from the "Customers" table, sorted by the "Country" column.
+SELECT * 
+FROM customers
+ORDER BY Country;
+
+-- Create a query that selects all Products with a price BETWEEN R100 and R600.
+SELECT * 
+FROM products
+WHERE BuyPrice BETWEEN 100 AND 600;
+
+-- Create a query that selects all fields from "Customers" where country is "Germany" AND city is "Berlin".
+SELECT * 
+FROM customers
+WHERE Country='Germany' AND City='Berlin';
+
+-- Create a query that selects all fields from "Customers" where city is "Cape Town" OR "Durban".
+SELECT * 
+FROM customers
+WHERE City='Cape Town' OR City='Durban';
+
+-- Select all records from Products where the Price is GREATER than R500.
+SELECT *
+FROM products
+WHERE BuyPrice > 500;
+
+-- Return the sum of the Amounts on the Payments table.
+SELECT SUM(Amount)
+FROM payments;
+
+-- Count the number of shipped orders in the Orders table.
+SELECT COUNT(Status)
+FROM orders
+WHERE Status = 'Shipped';
+
+-- Return the average price of all Products, in Rands and in Dollars (assume the exchange rate is R12 to the Dollar).
+SELECT AVG(BuyPrice) AS avg_in_rands
+FROM products
+
+SELECT AVG(BuyPrice) / 12  AS avg_in_dollars
+FROM products
+
+-- Using INNER JOIN create a query that selects all Payments with Customer information.
+SELECT *
+FROM payments
+INNER JOIN customers
+ON payments.CustomerID = customers.CustomerID;
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
